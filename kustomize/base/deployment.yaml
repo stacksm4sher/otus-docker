@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-docker-homework
+spec:
+  selector:
+    matchLabels:
+      app: k8s-docker-homework
+  template:
+    metadata:
+      labels:
+        app: k8s-docker-homework
+    spec:
+      containers:
+        - name: k8s-docker-homework
+          image: stacksm4sher/otus:docker-home-work
+          command:
+            - java org.springframework.boot.loader.JarLauncher
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: KUBERNETES_NAMESPACE
+              value: otus
+          volumeMounts:
+            - mountPath: /app/config
+              name: application-volume
+            - mountPath: /tmp
+              name: java-tmp-dir
+          securityContext:
+            runAsUser: 45011
+            runAsGroup: 45011
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: application-volume
+          configMap:
+            name: application-k8s-docker-homework
+        - name: java-tmp-dir
+          emptyDir: { }
